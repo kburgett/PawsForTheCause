@@ -1,3 +1,0 @@
-Delete: Name_intake, Found_Location, IntakeCondition, MonthYear_intake, Sex, Name_outcome, MonthYear_outcome, Outcome_Subtype, Sex_upon_Outcome, gender_outcome, fixed_outcome, fixed_change,
-
-Keep: Animal ID, DateTime_intake, Intake_Type, Animal_type, Age, Breed_intake, Color_intake, DateTime_outcome, Outcome_Type, Age_upon_Outcome, gender_intake, fixed_outcome, Age_Bucket, retriever, sheperd, beagle, terrier, boxer, poodle, rottweiler, dachshund, chihuahua, pitbull, DateTime_length, Days_length
