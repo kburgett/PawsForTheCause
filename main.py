@@ -1,4 +1,5 @@
 import utils 
+import decision_tree
 
 # Preprocessing Data 
 def preprocess():
@@ -75,20 +76,35 @@ def main():
     utils.write_csv("clean_data.csv", header, table)
 
     att_domains = {0: ["Stray", "Owner Surrender", "Wildlife", "Public Assist"], 
-        1: ["R", "Python", "Java"],
-        2: ["yes", "no"],
-        3: ["yes", "no"]}
+        1: ["Male", "Female"],
+        2: ["Spayed", "Neutered", "Intact"],
+        3: ["1-3 years", "1-6 months", "4-6 years", "1-6 weeks", "7+ years", "7-12 months", "Less than 1 week"], #age
+        4: [0, 1], # retriver
+        5: [0, 1], # shepard
+        6: [0, 1], # beagle
+        7: [0, 1], # terrier
+        8: [0, 1], # boxer
+        9: [0, 1], # poodle
+        10: [0, 1], # rottweiler
+        11: [0, 1], # dachshund
+        12: [0, 1], # chihuahua
+        13: [0, 1]} # pitbull
 
-    att_indexes = list(range(len(header) - 1))
+    att_indexes = list(range(14))
+    class_index = len(header) - 1
+
+    instance_to_classify = table[0]
+    decision_tree_classifier(table, att_indexes, att_domains, class_index, header, instance_to_classify)
 
 def decision_tree_classifier(table, att_indexes, att_domains, class_index, header, instance_to_classify):
     '''
     Calls the functions to get a decision tree for the data and uses that decision
     tree and classifies a given instance. Returns the classification to main()
     '''
-    tree = tdidt(table, att_indexes, att_indexes, att_domains, class_index, header, [])
-    classification = classify_instance(header, instance_to_classify, tree)
+    tree = decision_tree.tdidt(table, att_indexes, att_indexes, att_domains, class_index, header, [])
+    classification = decision_tree.classify_instance(header, instance_to_classify, tree)
     return classification
+
 
 if __name__ == "__main__":
     main()
