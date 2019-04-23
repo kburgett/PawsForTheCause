@@ -1,6 +1,10 @@
 '''
 Functions to get a decision tree classification
 '''
+import random
+import utils
+import math
+import copy
 
 def classify_instance(header, instance_to_classify, tree):
     '''

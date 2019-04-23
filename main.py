@@ -77,24 +77,27 @@ def main():
 
     att_domains = {0: ["Stray", "Owner Surrender", "Wildlife", "Public Assist"], 
         1: ["Male", "Female"],
-        2: ["Spayed", "Neutered", "Intact"],
-        3: ["1-3 years", "1-6 months", "4-6 years", "1-6 weeks", "7+ years", "7-12 months", "Less than 1 week"], #age
-        4: [0, 1], # retriver
-        5: [0, 1], # shepard
-        6: [0, 1], # beagle
-        7: [0, 1], # terrier
-        8: [0, 1], # boxer
-        9: [0, 1], # poodle
-        10: [0, 1], # rottweiler
-        11: [0, 1], # dachshund
-        12: [0, 1], # chihuahua
-        13: [0, 1]} # pitbull
+        2: ["Adoption", "Transfar", "Return to Owner", "Euthanasia", "Died", "Disposal", "Missing", "Rto-Adopt", "Relocate"],
+        3: ["Spayed", "Neutered", "Intact"],
+        4: ["1-3 years", "1-6 months", "4-6 years", "1-6 weeks", "7+ years", "7-12 months", "Less than 1 week"], #age
+        5: [0, 1], # retriver
+        6: [0, 1], # shepard
+        7: [0, 1], # beagle
+        8: [0, 1], # terrier
+        9: [0, 1], # boxer
+        10: [0, 1], # poodle
+        11: [0, 1], # rottweiler
+        12: [0, 1], # dachshund
+        13: [0, 1], # chihuahua
+        14: [0, 1]} # pitbull
+    domain_header = ["intake_type", "gender_intake", "outcome_type", "fixed_outcome", "age_bucket", "retriver", "shepard",
+                     "beagle", "terrier", "boxer", "poodle", "rottweiler", "dachshund", "chihuahua", "pibull"]
 
     att_indexes = list(range(14))
     class_index = len(header) - 1
 
     instance_to_classify = table[0]
-    decision_tree_classifier(table, att_indexes, att_domains, class_index, header, instance_to_classify)
+    #decision_tree_classifier(table, att_indexes, att_domains, class_index, domain_header, instance_to_classify)
 
 def decision_tree_classifier(table, att_indexes, att_domains, class_index, header, instance_to_classify):
     '''
