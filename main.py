@@ -47,7 +47,8 @@ def preprocess():
     '''
     attr, table = utils.parse_csv("adoption_data.csv")
     remove_attr = ['name_intake', 'found_location', 'intake_condition', 'month_year_intake', 'intake_sex', 'name_outcome', 
-        'month_year_outcome', 'outcome_subtype', 'outcome_sex', 'gender_outcome', 'fixed_intake', 'fixed_changed']
+        'month_year_outcome', 'outcome_subtype', 'outcome_sex', 'gender_outcome', 'fixed_intake', 'fixed_changed',
+        'breed_intake', 'color_intake', 'animal_id', 'date_time_intake', 'date_time_outcome', 'outcome_age', 'date_time_length']
 
     for col in remove_attr: 
         index = attr.index(col)
@@ -97,7 +98,7 @@ def main():
     class_index = len(header) - 1
 
     instance_to_classify = table[0]
-    #decision_tree_classifier(table, att_indexes, att_domains, class_index, domain_header, instance_to_classify)
+    decision_tree_classifier(table, att_indexes, att_domains, class_index, domain_header, instance_to_classify)
 
 def decision_tree_classifier(table, att_indexes, att_domains, class_index, header, instance_to_classify):
     '''
@@ -105,8 +106,9 @@ def decision_tree_classifier(table, att_indexes, att_domains, class_index, heade
     tree and classifies a given instance. Returns the classification to main()
     '''
     tree = decision_tree.tdidt(table, att_indexes, att_indexes, att_domains, class_index, header, [])
-    classification = decision_tree.classify_instance(header, instance_to_classify, tree)
-    return classification
+    print("Tree: ", tree)
+    #classification = decision_tree.classify_instance(header, instance_to_classify, tree)
+    #return classification
 
 
 if __name__ == "__main__":
