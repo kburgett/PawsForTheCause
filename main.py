@@ -1,4 +1,5 @@
 import utils 
+import decision_tree
 
 # Preprocessing Data 
 def preprocess():
@@ -46,7 +47,8 @@ def preprocess():
     '''
     attr, table = utils.parse_csv("adoption_data.csv")
     remove_attr = ['name_intake', 'found_location', 'intake_condition', 'month_year_intake', 'intake_sex', 'name_outcome', 
-        'month_year_outcome', 'outcome_subtype', 'outcome_sex', 'gender_outcome', 'fixed_intake', 'fixed_changed']
+        'month_year_outcome', 'outcome_subtype', 'outcome_sex', 'gender_outcome', 'fixed_intake', 'fixed_changed',
+        'breed_intake', 'color_intake', 'animal_id', 'date_time_intake', 'date_time_outcome', 'outcome_age', 'date_time_length']
 
     for col in remove_attr: 
         index = attr.index(col)
@@ -75,20 +77,39 @@ def main():
     utils.write_csv("clean_data.csv", header, table)
 
     att_domains = {0: ["Stray", "Owner Surrender", "Wildlife", "Public Assist"], 
-        1: ["R", "Python", "Java"],
-        2: ["yes", "no"],
-        3: ["yes", "no"]}
+        1: ["Male", "Female"],
+        2: ["Adoption", "Transfar", "Return to Owner", "Euthanasia", "Died", "Disposal", "Missing", "Rto-Adopt", "Relocate"],
+        3: ["Spayed", "Neutered", "Intact"],
+        4: ["1-3 years", "1-6 months", "4-6 years", "1-6 weeks", "7+ years", "7-12 months", "Less than 1 week"], #age
+        5: [0, 1], # retriver
+        6: [0, 1], # shepard
+        7: [0, 1], # beagle
+        8: [0, 1], # terrier
+        9: [0, 1], # boxer
+        10: [0, 1], # poodle
+        11: [0, 1], # rottweiler
+        12: [0, 1], # dachshund
+        13: [0, 1], # chihuahua
+        14: [0, 1]} # pitbull
+    domain_header = ["intake_type", "gender_intake", "outcome_type", "fixed_outcome", "age_bucket", "retriver", "shepard",
+                     "beagle", "terrier", "boxer", "poodle", "rottweiler", "dachshund", "chihuahua", "pibull"]
 
-    att_indexes = list(range(len(header) - 1))
+    att_indexes = list(range(14))
+    class_index = len(header) - 1
+
+    instance_to_classify = table[0]
+    decision_tree_classifier(table, att_indexes, att_domains, class_index, domain_header, instance_to_classify)
 
 def decision_tree_classifier(table, att_indexes, att_domains, class_index, header, instance_to_classify):
     '''
     Calls the functions to get a decision tree for the data and uses that decision
     tree and classifies a given instance. Returns the classification to main()
     '''
-    tree = tdidt(table, att_indexes, att_indexes, att_domains, class_index, header, [])
-    classification = classify_instance(header, instance_to_classify, tree)
-    return classification
+    tree = decision_tree.tdidt(table, att_indexes, att_indexes, att_domains, class_index, header, [])
+    print("Tree: ", tree)
+    #classification = decision_tree.classify_instance(header, instance_to_classify, tree)
+    #return classification
+
 
 if __name__ == "__main__":
     main()
