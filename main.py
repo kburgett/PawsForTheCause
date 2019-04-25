@@ -64,15 +64,12 @@ def preprocess():
             table.remove(row)
             print("REMOVE:", row[animal_index])
         else: 
-            print(row[animal_index])
             # Remove all duplicate animal entries 
             if row[animal_id_index] in animal_ids:
                 table.remove(row)
             else: 
                 print(row[animal_id_index])
                 animal_ids.add(row[animal_id_index]) 
-    print("ID: ", animal_id_index)
-    print("TYPE: ", animal_index)
 
     # Remove attributes not to be trained on from instances in the dataset 
     remove_attr = ['name_intake', 'date_time_intake', 'found_location', 'intake_condition', 
