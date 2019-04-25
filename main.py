@@ -54,25 +54,19 @@ def preprocess():
     '''
     attr, table = utils.parse_csv("adoption_data.csv")
 
-    # Remove animals that are not dogs and duplicate entries 
+    # Preserve animal entries for dogs 
+    animal_index = attr.index('animal_type_intake')
+    table = [row for row in table if row[animal_index] == 'Dog']
+
+    # Remove all duplicate entries 
     animal_ids = set()
     animal_id_index = attr.index('animal_id')
-    animal_index = attr.index('animal_type_intake')
     for row in table:
-        # Check that animal is a dog 
-        if row[animal_index].strip().lower() != 'dog':
+        if row[animal_id_index] in animal_ids:
             table.remove(row)
-            print("REMOVE:", row[animal_index])
         else: 
-            print(row[animal_index])
-            # Remove all duplicate animal entries 
-            if row[animal_id_index] in animal_ids:
-                table.remove(row)
-            else: 
-                print(row[animal_id_index])
-                animal_ids.add(row[animal_id_index]) 
-    print("ID: ", animal_id_index)
-    print("TYPE: ", animal_index)
+            print(row[animal_id_index])
+            animal_ids.add(row[animal_id_index]) 
 
     # Remove attributes not to be trained on from instances in the dataset 
     remove_attr = ['name_intake', 'date_time_intake', 'found_location', 'intake_condition', 
