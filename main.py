@@ -58,7 +58,7 @@ def preprocess():
 
     row_index = 0
     for row in table:
-        if table[row_index][3] != "Dog":
+        if table[row_index][1] != "Dog":
             del table[row_index]
             row_index -= 1
         row_index += 1
