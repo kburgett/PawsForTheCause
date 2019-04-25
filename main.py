@@ -99,12 +99,12 @@ def naive_bayes(attr, data):
 def main(): 
     '''
     '''
-    preprocess()
-    '''attr, table = utils.parse_csv("clean_data.csv")
+    #preprocess()
+    attr, table = utils.parse_csv("clean_data.csv")
     attr_indexes = list(range(len(attr)))
     class_index = attr_indexes.pop(len(attr) - 1)
-    attr_domains = utils.get_attr_domains(attr_indexes)
-
+    attr_domains = utils.get_attr_domains(table, attr_indexes)
+    '''
     instance_to_classify = table[0]
     decision_tree_classifier(table, original_table, attr_indexes, attr_domains, class_index, header, instance_to_classify)
     '''
