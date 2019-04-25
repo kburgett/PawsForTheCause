@@ -62,7 +62,7 @@ def preprocess():
         # Check that animal is a dog 
         if row[animal_index].strip().lower() != 'dog':
             table.remove(row)
-            print(row)
+            print("REMOVE:", row[animal_index])
         else: 
             print(row[animal_index])
             # Remove all duplicate animal entries 
@@ -106,33 +106,13 @@ def main():
     '''
     '''
     preprocess()
-    '''attr, original_table = utils.parse_csv("adoption_data.csv")
-    original_table = remove_other_animals(attr, original_table)
-
-    header, table = preprocess(attr, copy.deepcopy(original_table))
-    utils.write_csv("clean_data.csv", header, table)
-
-    att_domains = {0: ["Stray", "Owner Surrender", "Wildlife", "Public Assist"], 
-        1: ["Adoption", "Transfar", "Return to Owner", "Euthanasia", "Died", "Disposal", "Missing", "Rto-Adopt", "Relocate"],
-        2: ["Male", "Female"],
-        3: ["Spayed", "Neutered", "Intact"],
-        4: ["1-3 years", "1-6 months", "4-6 years", "1-6 weeks", "7+ years", "7-12 months", "Less than 1 week"], #age
-        5: ['0', '1'], # retriver
-        6: ['0', '1'], # shepard
-        7: ['0', '1'], # beagle
-        8: ['0', '1'], # terrier
-        9: ['0', '1'], # boxer
-        10: ['0', '1'], # poodle
-        11: ['0', '1'], # rottweiler
-        12: ['0', '1'], # dachshund
-        13: ['0', '1'], # chihuahua
-        14: ['0', '1']} # pitbull
-
-    att_indexes = list(range(14))
-    class_index = len(header) - 1
+    '''attr, table = utils.parse_csv("clean_data.csv")
+    attr_indexes = list(range(len(attr)))
+    class_index = attr_indexes.pop(len(attr) - 1)
+    attr_domains = utils.get_attr_domains(attr_indexes)
 
     instance_to_classify = table[0]
-    decision_tree_classifier(table, original_table, att_indexes, att_domains, class_index, header, instance_to_classify)
+    decision_tree_classifier(table, original_table, attr_indexes, attr_domains, class_index, header, instance_to_classify)
     '''
 
 def decision_tree_classifier(table, original_table, att_indexes, att_domains, class_index, header, instance_to_classify):
