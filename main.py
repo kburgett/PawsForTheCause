@@ -1,61 +1,14 @@
 import utils 
 import decision_tree
+import random
+import copy
 
 # Preprocessing Data 
-def preprocess():
-    '''
-    KEEP ATTRIBUTES:
-    'animal_id'
-    'date_time_intake'
-    'intake_type'
-    'animal_type_intake'
-    'age'
-    'breed_intake'
-    'color_intake'
-    'date_time_outcome'
-    'outcome_type'
-    'outcome_age'
-    'gender_intake'
-    'fixed_outcome'
-    'age_bucket'
-    'retriever'
-    'shepherd'
-    'beagle'
-    'terrier'
-    'boxer'
-    'poodle'
-    'rottweiler'
-    'dachshund'
-    'chihuahua'
-    'pitbull'
-    'date_time_length'
-    'time_bucket'
+def preprocess(attr, table):
 
-    DELETE ATTRIBUTES:
-    'name_intake'
-    'found_location'
-    'intake_condition'
-    'month_year_intake'
-    'intake_sex'
-    'name_outcome'
-    'month_year_outcome'
-    'outcome_subtype'
-    'outcome_sex'
-    'gender_outcome'
-    'fixed_intake'
-    'fixed_changed'
-    '''
-    attr, table = utils.parse_csv("adoption_data.csv")
     remove_attr = ['name_intake', 'found_location', 'intake_condition', 'month_year_intake', 'intake_sex', 'name_outcome', 
         'month_year_outcome', 'outcome_subtype', 'outcome_sex', 'gender_outcome', 'fixed_intake', 'fixed_changed',
         'breed_intake', 'color_intake', 'animal_id', 'date_time_intake', 'date_time_outcome', 'outcome_age', 'date_time_length', 'age', 'animal_type_intake']
-
-    row_index = 0
-    for row in table:
-        if table[row_index][1] != "Dog":
-            del table[row_index]
-            row_index -= 1
-        row_index += 1
 
     for col in remove_attr: 
         index = attr.index(col)
@@ -65,6 +18,15 @@ def preprocess():
     
     return attr, table
 
+def remove_other_animals(table):
+    row_index = 0
+    for row in table:
+        if table[row_index][7] != "Dog":
+            del table[row_index]
+            row_index -= 1
+        row_index += 1
+    return table
+
 # kNN Kristen
 # Decision Trees Alana
 # k-Means Clustering Kristen
@@ -73,7 +35,10 @@ def preprocess():
 def main(): 
     '''
     '''
-    header, table = preprocess()
+    attr, original_table = utils.parse_csv("adoption_data.csv")
+    original_table = remove_other_animals(original_table)
+
+    header, table = preprocess(attr, copy.deepcopy(original_table))
     utils.write_csv("clean_data.csv", header, table)
 
     att_domains = {0: ["Stray", "Owner Surrender", "Wildlife", "Public Assist"], 
@@ -91,27 +56,25 @@ def main():
         12: ['0', '1'], # dachshund
         13: ['0', '1'], # chihuahua
         14: ['0', '1']} # pitbull
-    domain_header = ["intake_type", "outcome_type", "gender_intake" "fixed_outcome", "age_bucket", "retriver", "shepard",
-                     "beagle", "terrier", "boxer", "poodle", "rottweiler", "dachshund", "chihuahua", "pitbull"]
 
     att_indexes = list(range(14))
     class_index = len(header) - 1
 
     instance_to_classify = table[0]
-    decision_tree_classifier(table, att_indexes, att_domains, class_index, domain_header, instance_to_classify)
+    decision_tree_classifier(table, original_table, att_indexes, att_domains, class_index, header, instance_to_classify)
 
-def decision_tree_classifier(table, att_indexes, att_domains, class_index, header, instance_to_classify):
+def decision_tree_classifier(table, original_table, att_indexes, att_domains, class_index, header, instance_to_classify):
     '''
     Calls the functions to get a decision tree for the data and uses that decision
     tree and classifies a given instance. Returns the classification to main()
     '''
-    #tree = decision_tree.tdidt(table, att_indexes, att_indexes, att_domains, class_index, header, [])
-    #tree = utils.tdidt(table, att_indexes, att_domains, class_index, header)
-    #print("Tree: ", tree)
-    classification = utils.classify_tdidt(utils.tdidt(table, att_indexes, att_domains, class_index, header), table[1], header)
+    rand_index = random.randint(0, len(table) - 1)
+    instance = table[rand_index]
+    tree = decision_tree.tdidt(table, att_indexes, att_indexes, att_domains, class_index, header, [])
+    utils.pretty_print(tree)
+    classification = decision_tree.classify_instance(header, instance, tree)
+    print(original_table[rand_index])
     print("Classification: ", classification)
-    #classification = decision_tree.classify_instance(header, instance_to_classify, tree)
-    #return classification
 
 
 if __name__ == "__main__":
