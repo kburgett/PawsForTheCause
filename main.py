@@ -45,6 +45,8 @@ def preprocess():
     'fixed_changed'
     '''
     attr, table = utils.parse_csv("adoption_data.csv")
+
+    # Remove attributes not to be trained on from instances in the dataset 
     remove_attr = ['name_intake', 'found_location', 'intake_condition', 'month_year_intake', 'intake_sex', 'name_outcome', 
         'month_year_outcome', 'outcome_subtype', 'outcome_sex', 'gender_outcome', 'fixed_intake', 'fixed_changed']
 
@@ -53,10 +55,14 @@ def preprocess():
         attr.pop(index)
         for row in table: 
             row.pop(index)
+
+    # Remove duplicate entries of an animal 
+    
     
     return attr, table
 
 # kNN 
+
 # Decision Trees 
 # k-Means Clustering 
 # Ensemble Learning: kNN or Decision Trees ??? 
@@ -64,7 +70,9 @@ def preprocess():
 def main(): 
     '''
     '''
-    preprocess()
+    attr, data = preprocess()
+    print(attr)
+    print(data)
 
 if __name__ == "__main__":
     main()

@@ -604,7 +604,7 @@ def attribute_entropy(instances, attr_index, class_index):
     
     return e_new
 
-def tdidt(instances, attr_indexes, attr_domains, class_index, header=None): 
+def tdidt(instances, attr_indexes, attr_domains, class_index, header=None, chosen_attr=False): 
     '''
     Create a TDIDT classifier using entropy to select splitting attributes
     PARAMETERS: instances = 2D list of data set instances
@@ -615,8 +615,11 @@ def tdidt(instances, attr_indexes, attr_domains, class_index, header=None):
     RETURN: sub_tree = tdidt 
     '''
     # Pick attribute ("attribute selection")
-    attr_index = select_attribute(instances, attr_indexes, class_index)
-    attr_indexes.remove(attr_index)
+    if not chosen_attr: 
+        attr_index = select_attribute(instances, attr_indexes, class_index)
+        attr_indexes.remove(attr_index)
+    else:
+        attr_index = attr_indexes.pop(0)
     
     # Parition data by attribute values 
     partition = partition_instances(instances, attr_index, attr_domains[attr_index])
@@ -886,3 +889,77 @@ def pretty_print(decision_tree):
         else:
             print(ch, end='')
     print('\n')
+
+#######################################
+# ENSEMBLE LEARNING  
+#######################################
+def get_random_attr_subset(attributes, F):
+    '''
+    Randomly select F attributes to train on given list of available attributes
+    PARAMETERS: attributes = list of attribute indexes to be used to train tree
+                F = number of attributes used to generate tree
+    RETURNS: slice of list with F attribute indexes
+    '''
+    shuffled = attributes[:]    # make a copy 
+    random.shuffle(shuffled)
+    return shuffled[:F]
+
+def compute_bootstrapped_sample(table):
+    '''
+    Generate bootstrap sample of instances
+    PARAMETERS: table = 2D list of instances
+    RETURNS: sample = 2D list of instances randomly selected from table with same 
+                        number of instances
+    '''
+    n = len(table)
+    sample = []
+    for _ in range(n): 
+        rand_index = random.randrange(0, n)
+        sample.append(table[rand_index])
+    
+    return sample 
+
+def random_forest(table, attr_indexes, attr_domains, class_index, col_names, N, M, F):
+    '''
+    Generate random forest 
+    PARAMETERS: table = 2D list of data set instances
+                attr_indexes = list of attribute indexes to classify instances on
+                attr_domains = list of dictionaries containing domains of attributes
+                class_index = column index of classifier 
+                col_names = list of names for columns/attributes of instances 
+                N = number of bootstrap samples to be generated
+                M = number of top decision trees to be selected 
+                F = number of attributes to train tree on   
+    RETURNS: top_m_classifiers = top M classifiers (forest ensemble)
+    '''
+    # M best classifiers
+    top_m_classifiers = [0 for _ in range(M)]
+    top_m_accuracies = [-1 for _ in range(M)]
+    
+    # Creating N bootstrap samples (from remainder set)
+    for inst in range(N): 
+        # Bootstrap remainder set into training and validation set 
+        train_set = compute_bootstrapped_sample(table)
+        validation_set = [x for x in table if x not in train_set]
+
+        # Build classifier for sample
+        attr_index_subset = get_random_attr_subset(attr_indexes, F)
+        tree = tdidt(train_set, attr_index_subset, attr_domains, class_index, col_names)
+
+        # Determine accuracy of classifier 
+        tp_tn = 0
+        for v in validation_set:
+            pred = classify_tdidt(tree, v, col_names)
+            actual = v[class_index]
+            if pred == actual:
+                tp_tn += 1
+        classifier_accuracy = tp_tn / len(validation_set) 
+
+        # Check if classifier qualifiers for top M classifiers
+        if classifier_accuracy > min(top_m_accuracies):
+            acc_index = top_m_accuracies.index(min(top_m_accuracies))
+            top_m_accuracies[acc_index] = classifier_accuracy
+            top_m_classifiers[acc_index] = tree
+    
+    return top_m_classifiers
+    
