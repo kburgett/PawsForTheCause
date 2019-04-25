@@ -63,16 +63,16 @@ def preprocess():
     animal_index = attr.index('animal_type_intake')
     print(animal_index)
     print(table[:2])
-    new_table = []
     for row in table:
         print(row[animal_index])
-        if row[animal_index].strip().lower() == 'dog':
-            new_table.append(row)
+        if row[animal_index].strip().lower() != 'dog':
+            del row
+            print("DELETE")
 
-    utils.write_csv('clean_data.csv', attr, new_table)        
+    utils.write_csv('clean_data.csv', attr, table)        
     '''row_index = 0
     for row in table:
-        if table[row_index][1] != "Dog":
+        if table[row_index][3] != "Dog":
             del table[row_index]
             row_index -= 1
         row_index += 1'''
