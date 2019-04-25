@@ -620,6 +620,9 @@ def tdidt(instances, attr_indexes, attr_domains, class_index, header=None):
     
     # Parition data by attribute values 
     partition = partition_instances(instances, attr_index, attr_domains[attr_index])
+    #print("INSTANCES: ", instances)
+    print("att_index = ", attr_index)
+    print("PARTITION: ", partition)
 
     case3 = False
     sub_tree = ["Attribute", header[attr_index]]
@@ -752,6 +755,8 @@ def compute_partition_voting(partitions, class_index):
                 votes[label] = vote
     k = list(votes.keys())
     v = list(votes.values())
+    print("Votes Keys: ", k)
+    print("Votes Values: ", v)
     return k[v.index(max(v))]
 
 def classify_tdidt(decision_tree, instance, header): 
