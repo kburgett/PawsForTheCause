@@ -47,34 +47,33 @@ def preprocess():
     '''
     attr, table = utils.parse_csv("adoption_data.csv")
 
+    # Remove animals that are not dogs 
+    animal_index = attr.index('animal_type_intake')
+    for row in table:
+        if row[animal_index].strip().lower() != 'dog':
+            table.remove(row)  
+
+    # Remove all duplicate entries of animals
+    animal_ids = set()
+    animal_id_index = attr.index('animal_id')
+    for row in table: 
+        if row[animal_id_index] in animal_ids:
+            table.remove(row)
+        else: 
+            animal_ids.add(row[animal_id_index])      
+
     # Remove attributes not to be trained on from instances in the dataset 
     remove_attr = ['name_intake', 'date_time_intake', 'found_location', 'intake_condition', 
                     'month_year_intake', 'intake_sex', 'breed_intake', 'color_intake', 'name_outcome', 
                     'date_time_outcome', 'month_year_outcome','outcome_subtype', 'outcome_sex', 
                     'outcome_age', 'gender_outcome', 'fixed_intake', 'fixed_changed', 'date_time_length']
 
+    # Remove each attribute from all rows 
     for col in remove_attr: 
         index = attr.index(col)
         attr.pop(index)
         for row in table: 
-            row.pop(index)
-
-    # Remove all duplicate entries of animals and animals that are not dogs 
-    animal_ids = set()
-    animal_id_index = attr.index('animal_id')
-    animal_index = attr.index('animal_type_intake')
-    
-    for row in table:
-        # Remove animals that are not dogs 
-        if row[animal_index].strip().lower() != 'dog':
-            table.remove(row)
-        else: 
-            # Remove all duplicate entries of animals
-            if row[animal_id_index] in animal_ids:
-                table.remove(row)
-            else: 
-                animal_ids.add(row[animal_id_index])
-            
+            row.pop(index)    
 
     utils.write_csv('clean_data.csv', attr, table)
 
@@ -118,7 +117,6 @@ def decision_tree_classifier(table, att_indexes, att_domains, class_index, heade
     #print("Tree: ", tree)
     #classification = decision_tree.classify_instance(header, instance_to_classify, tree)
     #return classification
-
 
 if __name__ == "__main__":
     main()
