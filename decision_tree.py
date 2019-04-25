@@ -34,13 +34,10 @@ def tdidt(instances, att_indexes, all_att_indexes, att_domains, class_index, hea
     '''
     Uses the tdidt algorithm to build a decision tree based on a given set of data
     '''
-    print("CURRENT TREE: ", tree)
     if att_indexes == []:
         return
     att_index = entropy(instances, header, att_domains, att_indexes)
-    #print("att_index = ", att_index, "\n")
     att_indexes.remove(att_index)
-    #print("att_domains = ", att_domains, "\n")
     partition = partition_instances(instances, att_index, att_domains[att_index])
     partition_keys = partition.keys()
     
@@ -52,11 +49,8 @@ def tdidt(instances, att_indexes, all_att_indexes, att_domains, class_index, hea
         col = utils.get_column(partition.get(att_domains[att_index][i]), len(header)-1)
         items_in_col = []
         for item in col:
-            #print("checking item: ", item)
-            #print(items_in_col)
             if item not in items_in_col:
                 items_in_col.append(item)
-        #print("Looking at col: ", items_in_col)
         if len(items_in_col) == 1:
             tree[2+count].append(["Leaves", has_same_class_label(instances, header, att_index, class_index, col, items_in_col[0])])
         elif len(att_indexes) == 0 and len(col) > 0:
