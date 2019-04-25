@@ -17,12 +17,15 @@ def preprocess(attr, table):
             row.pop(index)
     
     return attr, table
+            
+    utils.write_csv('clean_data.csv', attr, table)
 
+def remove_other_animals(attr, table):
     # Remove all duplicate entries of animals and animals that are not dogs 
     animal_ids = set()
     animal_id_index = attr.index('animal_id')
     animal_index = attr.index('animal_type_intake')
-    
+
     for row in table:
         # Remove animals that are not dogs 
         if row[animal_index].strip().lower() != 'dog':
@@ -33,9 +36,7 @@ def preprocess(attr, table):
                 table.remove(row)
             else: 
                 animal_ids.add(row[animal_id_index])
-            
-
-    utils.write_csv('clean_data.csv', attr, table)
+    return table
 
 # Naive Bayes Kristen
 def naive_bayes(attr, data): 
@@ -54,7 +55,7 @@ def main():
     '''
     '''
     attr, original_table = utils.parse_csv("adoption_data.csv")
-    original_table = remove_other_animals(original_table)
+    original_table = remove_other_animals(attr, original_table)
 
     header, table = preprocess(attr, copy.deepcopy(original_table))
     utils.write_csv("clean_data.csv", header, table)
