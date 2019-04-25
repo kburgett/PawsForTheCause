@@ -18,16 +18,34 @@ def preprocess(attr, table):
     
     return attr, table
 
-def remove_other_animals(table):
-    row_index = 0
+    # Remove all duplicate entries of animals and animals that are not dogs 
+    animal_ids = set()
+    animal_id_index = attr.index('animal_id')
+    animal_index = attr.index('animal_type_intake')
+    
     for row in table:
-        if table[row_index][7] != "Dog":
-            del table[row_index]
-            row_index -= 1
-        row_index += 1
-    return table
+        # Remove animals that are not dogs 
+        if row[animal_index].strip().lower() != 'dog':
+            table.remove(row)
+        else: 
+            # Remove all duplicate entries of animals
+            if row[animal_id_index] in animal_ids:
+                table.remove(row)
+            else: 
+                animal_ids.add(row[animal_id_index])
+            
 
-# kNN Kristen
+    utils.write_csv('clean_data.csv', attr, table)
+
+# Naive Bayes Kristen
+def naive_bayes(attr, data): 
+    '''
+    '''
+    class_index = attr.index('time_bucket')
+    
+    # Stratify data across 10 folds
+    stratified_data = utils.stratify_data(data, class_index, 10)
+
 # Decision Trees Alana
 # k-Means Clustering Kristen
 # Ensemble Learning: kNN or Decision Trees Alana ??? 

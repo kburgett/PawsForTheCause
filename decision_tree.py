@@ -14,7 +14,7 @@ def classify_instance(header, instance_to_classify, tree):
     not account for this instance, it returns 'Unable to classify'
     '''
     for branch in tree:
-        print(branch)
+        #print(branch)
         if branch == "Leaves":
             return tree[1][0]
 
