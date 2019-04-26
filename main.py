@@ -142,11 +142,13 @@ def naive_bayes(table, attr, attr_indexes, class_index):
     stratified_data = utils.stratify_data(table, class_index, 10)
 
     tp_tn = 0
-    for fold in stratified_data:
+    total = 0
+    for i in range(len(stratified_data)):
         train_set = []
-        test_set = stratified_data.pop(fold)
-        for i in stratified_data:
-            train_set.extend(i)
+        test_set = stratified_data.pop(i)
+        total += len(test_set)
+        for j in stratified_data:
+            train_set.extend(j)
         
         # Calculate probabilities of training set 
         classes, conditions, priors, posts = utils.prior_post_probabilities(train_set, attr, class_index, attr_indexes)
@@ -156,6 +158,19 @@ def naive_bayes(table, attr, attr_indexes, class_index):
             # Classify predicted and actual classes
             pred_class = utils.naive_bayes(train_set, classes, conditions, attr, priors, posts, inst, class_index)
             actual_class = inst[class_index]
+            print(pred_class, "\t\t", actual_class)
+            if pred_class == actual_class:
+                tp_tn += 1
+        
+        # Return test set to stratified folds 
+        stratified_data.insert(i, test_set)
+    
+    acc = tp_tn / total
+    print("\n\nNAIVE BAYES")
+    print("-" * 50)
+    print("Accuracy = %f" % acc)
+    print("Error Rate = %f" % (1 - acc))
+            
 
 # Decision Trees: Alana
 def decision_tree_classifier(table, original_table, attr_indexes, attr_domains, class_index, header, instance_to_classify):
@@ -185,16 +200,18 @@ def main():
     #attr, table = discretize_age(table, attr)
     utils.convert_data_to_numeric(table)
 
+    age_index = attr.index('age')
+    attr.pop(age_index)
+    for row in table: 
+        row.pop(age_index)
+    
     # Gather attribute indexes, attribute domains, and classifying attribute index 
     attr_indexes = list(range(len(attr)))
     class_index = attr_indexes.pop(len(attr) - 1)
     attr_domains = utils.get_attr_domains(table, attr, attr_indexes)
     
-    for key in attr_domains:
-        print(key, attr_domains[key])
-    
     naive_bayes(table, attr, attr_indexes, class_index)
-
+    
     instance_to_classify = table[0]
     decision_tree_classifier(table, original_table, attr_indexes, attr_domains, class_index, attr, instance_to_classify)
 
