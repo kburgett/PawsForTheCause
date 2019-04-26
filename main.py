@@ -70,6 +70,8 @@ def preprocess():
         else: 
             print(row[animal_id_index])
             animal_ids.add(row[animal_id_index]) 
+    dogs_data = copy.deepcopy(table)
+    utils.write_csv('dogs_data.csv', attr, dogs_data)
 
     # Remove attributes not to be trained on from instances in the dataset 
     remove_attr = ['animal_id', 'name_intake', 'date_time_intake', 'found_location', 'intake_condition', 
@@ -133,15 +135,43 @@ def discretize_age(table, attr):
 
 
 # Naive Bayes: Kristen
-def naive_bayes(table, attr, class_index): 
+def naive_bayes(table, attr, attr_indexes, class_index): 
     '''
     '''  
     # Stratify data across 10 folds
     stratified_data = utils.stratify_data(table, class_index, 10)
 
-    #for fold in stratified_data:
+    tp_tn = 0
+    for fold in stratified_data:
+        train_set = []
+        test_set = stratified_data.pop(fold)
+        for i in stratified_data:
+            train_set.extend(i)
+        
+        # Calculate probabilities of training set 
+        classes, conditions, priors, posts = utils.prior_post_probabilities(train_set, attr, class_index, attr_indexes)
+
+        # Iterate through test set 
+        for inst in test_set:
+            # Classify predicted and actual classes
+            pred_class = utils.naive_bayes(train_set, classes, conditions, attr, priors, posts, inst, class_index)
+            actual_class = inst[class_index]
 
 # Decision Trees: Alana
+def decision_tree_classifier(table, original_table, attr_indexes, attr_domains, class_index, header, instance_to_classify):
+    '''
+    Calls the functions to get a decision tree for the data and uses that decision
+    tree and classifies a given instance. Returns the classification to main()
+    '''
+    rand_index = random.randint(0, len(table) - 1)
+    instance = table[rand_index]
+    print("Classifying instance: ", instance)
+    tree = decision_tree.tdidt(table, attr_indexes, attr_indexes, attr_domains, class_index, header, [])
+    utils.pretty_print(tree)
+    classification = decision_tree.classify_instance(header, instance, tree)
+    print(original_table[rand_index])
+    print("Classification: ", classification)
+
 # k-Means Clustering: Kristen
 # Ensemble Learning: kNN or Decision Trees Alana ??? 
 
@@ -151,6 +181,7 @@ def main():
     # Preprocess and prep data to be manipulated 
     #preprocess()
     attr, table = utils.parse_csv("clean_data.csv")
+    original_attr, original_table = utils.parse_csv('dogs_data.csv')
     #attr, table = discretize_age(table, attr)
     utils.convert_data_to_numeric(table)
 
@@ -162,24 +193,10 @@ def main():
     for key in attr_domains:
         print(key, attr_domains[key])
     
-    naive_bayes(table, attr, class_index)
-    '''
-    instance_to_classify = table[0]
-    decision_tree_classifier(table, original_table, attr_indexes, attr_domains, class_index, header, instance_to_classify)
-    '''
+    naive_bayes(table, attr, attr_indexes, class_index)
 
-def decision_tree_classifier(table, original_table, attr_indexes, attr_domains, class_index, header, instance_to_classify):
-    '''
-    Calls the functions to get a decision tree for the data and uses that decision
-    tree and classifies a given instance. Returns the classification to main()
-    '''
-    rand_index = random.randint(0, len(table) - 1)
-    instance = table[rand_index]
-    tree = decision_tree.tdidt(table, attr_indexes, attr_indexes, attr_domains, class_index, header, [])
-    utils.pretty_print(tree)
-    classification = decision_tree.classify_instance(header, instance, tree)
-    print(original_table[rand_index])
-    print("Classification: ", classification)
+    instance_to_classify = table[0]
+    decision_tree_classifier(table, original_table, attr_indexes, attr_domains, class_index, attr, instance_to_classify)
 
 if __name__ == "__main__":
     main()
