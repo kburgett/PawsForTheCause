@@ -10,7 +10,6 @@ def preprocess():
     'animal_id'
     'date_time_intake'
     'intake_type'
-    'animal_type_intake'
     'age'
     'breed_intake'
     'color_intake'
@@ -32,10 +31,12 @@ def preprocess():
     'pitbull'
     'date_time_length'
     'time_bucket'
+
     DELETE ATTRIBUTES:
     'name_intake'
     'date_time_intake'
     'found_location'
+    'animal_type_intake'
     'intake_condition'
     'month_year_intake'
     'intake_sex'
@@ -69,7 +70,7 @@ def preprocess():
             animal_ids.add(row[animal_id_index]) 
 
     # Remove attributes not to be trained on from instances in the dataset 
-    remove_attr = ['name_intake', 'date_time_intake', 'found_location', 'intake_condition', 
+    remove_attr = ['name_intake', 'date_time_intake', 'found_location', 'intake_condition', 'animal_type_intake',
                     'month_year_intake', 'intake_sex', 'breed_intake', 'color_intake', 'name_outcome', 
                     'date_time_outcome', 'month_year_outcome','outcome_subtype', 'outcome_sex', 
                     'outcome_age', 'gender_outcome', 'fixed_intake', 'fixed_changed', 'date_time_length']
@@ -84,13 +85,14 @@ def preprocess():
     utils.write_csv('clean_data.csv', attr, table)
 
 # Naive Bayes: Kristen
-def naive_bayes(attr, data): 
+def naive_bayes(table, attr, class_index): 
     '''
-    '''
-    class_index = attr.index('time_bucket')
-    
+    '''  
     # Stratify data across 10 folds
-    stratified_data = utils.stratify_data(data, class_index, 10)
+    stratified_data = utils.stratify_data(table, class_index, 10)
+
+    for fold in stratified_data:
+        print(fold[0])
 
 # Decision Trees: Alana
 # k-Means Clustering: Kristen
@@ -104,6 +106,8 @@ def main():
     attr_indexes = list(range(len(attr)))
     class_index = attr_indexes.pop(len(attr) - 1)
     attr_domains = utils.get_attr_domains(table, attr_indexes)
+
+    naive_bayes(table, attr, class_index)
     '''
     instance_to_classify = table[0]
     decision_tree_classifier(table, original_table, attr_indexes, attr_domains, class_index, header, instance_to_classify)

@@ -937,7 +937,7 @@ def random_forest(table, attr_indexes, attr_domains, class_index, col_names, N, 
     top_m_accuracies = [-1 for _ in range(M)]
     
     # Creating N bootstrap samples (from remainder set)
-    for inst in range(N): 
+    for _ in range(N): 
         # Bootstrap remainder set into training and validation set 
         train_set = compute_bootstrapped_sample(table)
         validation_set = [x for x in table if x not in train_set]
