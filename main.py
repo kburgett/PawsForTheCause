@@ -68,12 +68,14 @@ def preprocess():
         else: 
             print(row[animal_id_index])
             animal_ids.add(row[animal_id_index]) 
+    dogs_data = copy.deepcopy(table)
+    utils.write_csv('dogs_data.csv', attr, dogs_data)
 
     # Remove attributes not to be trained on from instances in the dataset 
     remove_attr = ['name_intake', 'date_time_intake', 'found_location', 'intake_condition', 'animal_type_intake',
                     'month_year_intake', 'intake_sex', 'breed_intake', 'color_intake', 'name_outcome', 
                     'date_time_outcome', 'month_year_outcome','outcome_subtype', 'outcome_sex', 
-                    'outcome_age', 'gender_outcome', 'fixed_intake', 'fixed_changed', 'date_time_length']
+                    'outcome_age', 'gender_outcome', 'fixed_intake', 'fixed_changed', 'date_time_length', 'animal_id']
 
     # Remove each attribute from all rows 
     for col in remove_attr: 
@@ -101,17 +103,18 @@ def naive_bayes(table, attr, class_index):
 def main(): 
     '''
     '''
-    #preprocess()
+    preprocess()
     attr, table = utils.parse_csv("clean_data.csv")
+    original_attr, original_table = utils.parse_csv("dogs_data.csv")
     attr_indexes = list(range(len(attr)))
     class_index = attr_indexes.pop(len(attr) - 1)
     attr_domains = utils.get_attr_domains(table, attr_indexes)
 
     naive_bayes(table, attr, class_index)
-    '''
+
     instance_to_classify = table[0]
-    decision_tree_classifier(table, original_table, attr_indexes, attr_domains, class_index, header, instance_to_classify)
-    '''
+    decision_tree_classifier(table, original_table, attr_indexes, attr_domains, class_index, attr, instance_to_classify)
+    
 
 def decision_tree_classifier(table, original_table, att_indexes, att_domains, class_index, header, instance_to_classify):
     '''
@@ -120,6 +123,7 @@ def decision_tree_classifier(table, original_table, att_indexes, att_domains, cl
     '''
     rand_index = random.randint(0, len(table) - 1)
     instance = table[rand_index]
+    print("Classifying instance: ", instance)
     tree = decision_tree.tdidt(table, att_indexes, att_indexes, att_domains, class_index, header, [])
     utils.pretty_print(tree)
     classification = decision_tree.classify_instance(header, instance, tree)
