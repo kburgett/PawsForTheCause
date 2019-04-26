@@ -34,6 +34,8 @@ def tdidt(instances, att_indexes, all_att_indexes, att_domains, class_index, hea
     '''
     Uses the tdidt algorithm to build a decision tree based on a given set of data
     '''
+    print("Current Tree: ", tree)
+    print("att_indexes = ", att_indexes)
     if att_indexes == []:
         return
     att_index = entropy(instances, header, att_domains, att_indexes)
@@ -45,6 +47,7 @@ def tdidt(instances, att_indexes, all_att_indexes, att_domains, class_index, hea
     tree.append(header[att_index])
     count = 0
     for i in range(len(att_domains[att_index])):
+        print(i)
         tree.append(["Value", att_domains[att_index][count]])
         col = utils.get_column(partition.get(att_domains[att_index][i]), len(header)-1)
         items_in_col = []
@@ -76,10 +79,15 @@ def find_entropy_value(table, header, attribute_index, att_domains):
     '''
     e_yes_values = []
     e_no_values = []
+    #print("att_domains: ", att_domains)
     for att in att_domains:
+        print("ATT: ", att)
         num_yes = 0
         total = 0
+        count = 0
         for instance in table:
+            #print(count)
+            count += 1
             if instance[attribute_index] == att:
                 num_yes += 1
             total += 1
@@ -87,6 +95,7 @@ def find_entropy_value(table, header, attribute_index, att_domains):
         e_no_values.append((total - num_yes)/ total)
         e_new = 0
         for i in range(len(e_yes_values)):
+            print("yes_value: ", i)
             if e_yes_values[i] == 0:
                 e_new += - (e_no_values[i] * math.log(e_no_values[i], 2))
             elif e_no_values[i] == 0:
@@ -106,10 +115,13 @@ def entropy(table, header, att_domains, att_indexes):
     if len(att_indexes) == 1:
         return att_indexes[0]
     for i in range(len(header) - 1):
+        #print("first for loop: ", i)
         value = find_entropy_value(table, header, i, att_domains[i])
+        #print("entropy_value = ", value)
         if value != 0:
             entropy_values.append(value)
     for i in range(len(entropy_values)):
+        #print("second for loop: ", i)
         if entropy_values[i] > max_val:
             max_val = entropy_values[i]
             max_index = i
