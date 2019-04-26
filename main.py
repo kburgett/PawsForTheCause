@@ -7,7 +7,6 @@ import copy
 def preprocess():
     '''
     KEEP ATTRIBUTES:
-    'animal_id'
     'date_time_intake'
     'intake_type'
     'age'
@@ -33,6 +32,7 @@ def preprocess():
     'time_bucket'
 
     DELETE ATTRIBUTES:
+    'animal_id'
     'name_intake'
     'date_time_intake'
     'found_location'
@@ -55,14 +55,16 @@ def preprocess():
     '''
     attr, table = utils.parse_csv("adoption_data.csv")
 
-    # Preserve animal entries for dogs 
+    # Preserve animal entries for dogs and classifying attribute entry 
     animal_index = attr.index('animal_type_intake')
-    table = [row for row in table if row[animal_index] == 'Dog']
+    class_index = attr.index('time_bucket')
+    table = [row for row in table if row[animal_index] == 'Dog' and row[class_index] != '']
 
     # Remove all duplicate entries 
     animal_ids = set()
     animal_id_index = attr.index('animal_id')
     for row in table:
+        # Check for duplicates
         if row[animal_id_index] in animal_ids:
             table.remove(row)
         else: 
@@ -70,9 +72,9 @@ def preprocess():
             animal_ids.add(row[animal_id_index]) 
 
     # Remove attributes not to be trained on from instances in the dataset 
-    remove_attr = ['name_intake', 'date_time_intake', 'found_location', 'intake_condition', 'animal_type_intake',
-                    'month_year_intake', 'intake_sex', 'breed_intake', 'color_intake', 'name_outcome', 
-                    'date_time_outcome', 'month_year_outcome','outcome_subtype', 'outcome_sex', 
+    remove_attr = ['animal_id', 'name_intake', 'date_time_intake', 'found_location', 'intake_condition', 
+                    'animal_type_intake', 'month_year_intake', 'intake_sex', 'breed_intake', 'color_intake', 
+                    'name_outcome', 'date_time_outcome', 'month_year_outcome','outcome_subtype', 'outcome_sex', 
                     'outcome_age', 'gender_outcome', 'fixed_intake', 'fixed_changed', 'date_time_length']
 
     # Remove each attribute from all rows 
@@ -84,6 +86,52 @@ def preprocess():
 
     utils.write_csv('clean_data.csv', attr, table)
 
+def discretize_age(table, attr):
+    '''
+    '''
+    age_index = attr.index('age')
+    age_bucket_index = attr.index('age_bucket')
+    age_bucket_domain = utils.get_attr_domains(table, attr, [age_bucket_index])
+    age_bucket_domain = age_bucket_domain['age_bucket']
+    
+    # Bucket Keys
+    years = sorted([y for y in age_bucket_domain if 'year' in y], reverse=True)
+    months = sorted([m for m in age_bucket_domain if 'month' in m], reverse=True)
+    weeks = sorted([w for w in age_bucket_domain if 'week' in w], reverse=True)
+    days = weeks.pop(0)
+
+    for row in table: 
+        print(row[age_index], end='\t\t')
+        # Days
+        if 'day' in row[age_index]:
+            row[age_index] = days 
+        # Weeks
+        if 'week' in row[age_index]:
+            row[age_index] = weeks[0]
+        # Months
+        if 'month' in row[age_index]:
+            val = row[age_index].split(' ')[0]
+            for m in months:
+                if val > m[0]:
+                    row[age_index] = m
+                    break
+            row[age_index] = months[len(months) - 1]
+        # Years
+        if 'year' in row[age_index]:
+            val = row[age_index].split(' ')[0]
+            for y in years:
+                if val > y[0]:
+                    row[age_index] = y
+                    break
+            row[age_index] = years[len(years) - 1]  
+         
+        print(row[age_index])
+
+    print("SOS:", age_bucket_domain)
+    
+    return attr, table
+
+
 # Naive Bayes: Kristen
 def naive_bayes(table, attr, class_index): 
     '''
@@ -91,8 +139,7 @@ def naive_bayes(table, attr, class_index):
     # Stratify data across 10 folds
     stratified_data = utils.stratify_data(table, class_index, 10)
 
-    for fold in stratified_data:
-        print(fold[0])
+    #for fold in stratified_data:
 
 # Decision Trees: Alana
 # k-Means Clustering: Kristen
@@ -101,26 +148,34 @@ def naive_bayes(table, attr, class_index):
 def main(): 
     '''
     '''
+    # Preprocess and prep data to be manipulated 
     #preprocess()
     attr, table = utils.parse_csv("clean_data.csv")
+    #attr, table = discretize_age(table, attr)
+    utils.convert_data_to_numeric(table)
+
+    # Gather attribute indexes, attribute domains, and classifying attribute index 
     attr_indexes = list(range(len(attr)))
     class_index = attr_indexes.pop(len(attr) - 1)
-    attr_domains = utils.get_attr_domains(table, attr_indexes)
-
+    attr_domains = utils.get_attr_domains(table, attr, attr_indexes)
+    
+    for key in attr_domains:
+        print(key, attr_domains[key])
+    
     naive_bayes(table, attr, class_index)
     '''
     instance_to_classify = table[0]
     decision_tree_classifier(table, original_table, attr_indexes, attr_domains, class_index, header, instance_to_classify)
     '''
 
-def decision_tree_classifier(table, original_table, att_indexes, att_domains, class_index, header, instance_to_classify):
+def decision_tree_classifier(table, original_table, attr_indexes, attr_domains, class_index, header, instance_to_classify):
     '''
     Calls the functions to get a decision tree for the data and uses that decision
     tree and classifies a given instance. Returns the classification to main()
     '''
     rand_index = random.randint(0, len(table) - 1)
     instance = table[rand_index]
-    tree = decision_tree.tdidt(table, att_indexes, att_indexes, att_domains, class_index, header, [])
+    tree = decision_tree.tdidt(table, attr_indexes, attr_indexes, attr_domains, class_index, header, [])
     utils.pretty_print(tree)
     classification = decision_tree.classify_instance(header, instance, tree)
     print(original_table[rand_index])

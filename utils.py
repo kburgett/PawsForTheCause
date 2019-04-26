@@ -103,7 +103,7 @@ def convert_data_to_numeric(data):
     for row in data:
         for i in range(len(row)):
             try: 
-                int_value = float(row[i])
+                int_value = int(row[i])
                 row[i] = int_value       # attribute is a numeric value
             except ValueError:
                 pass
@@ -555,7 +555,7 @@ def gaussian(x, mean, stdev):
 #######################################
 # DECISION TREES 
 #######################################
-def get_attr_domains(table, attr_indexes):
+def get_attr_domains(table, attr, attr_indexes):
     '''
     Gather all possible values (domains) for given attributes
     PARAMETERS: table = 2D list of data set 
@@ -565,7 +565,8 @@ def get_attr_domains(table, attr_indexes):
     attr_domains = dict()
     for i in attr_indexes:
         attr_col = get_column(table, i)
-        attr_domains[i] = list(set(attr_col))
+        attr_index = attr[i]
+        attr_domains[attr_index] = list(set(attr_col))
 
     return attr_domains
 
