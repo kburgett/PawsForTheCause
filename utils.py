@@ -790,7 +790,7 @@ def tdidt_stratify_and_confusion_matrix(data, attributes, attr_indexes, attr_dom
     RETURNS: accuracy and printed confusion matrix of classifying results 
     '''
     if discretization is None:
-        class_labels = list(get_attr_domains(data, [class_index]).values())
+        class_labels = list(get_attr_domains(data, [class_index]).values()) 
         class_labels = class_labels[0]
     else: 
         class_labels = list(range(1, 10))
@@ -875,6 +875,7 @@ def tdidt_rules(decision_tree, attributes, class_index, path=[]):
 
 def pretty_print(decision_tree):
     '''
+    Nice print of tree 
     '''
     tab_count = -1
     tree_str = str(decision_tree)
@@ -964,3 +965,6 @@ def random_forest(table, attr_indexes, attr_domains, class_index, col_names, N, 
     
     return top_m_classifiers
     
+#######################################
+# CLUSTERING  
+#######################################

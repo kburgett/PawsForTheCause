@@ -9,7 +9,6 @@ def preprocess():
     KEEP ATTRIBUTES:
     'date_time_intake'
     'intake_type'
-    'age'
     'breed_intake'
     'color_intake'
     'date_time_outcome'
@@ -40,6 +39,7 @@ def preprocess():
     'intake_condition'
     'month_year_intake'
     'intake_sex'
+    'age'
     'breed_intake'
     'color_intake'
     'name_outcome'
@@ -75,7 +75,7 @@ def preprocess():
 
     # Remove attributes not to be trained on from instances in the dataset 
     remove_attr = ['animal_id', 'name_intake', 'date_time_intake', 'found_location', 'intake_condition', 
-                    'animal_type_intake', 'month_year_intake', 'intake_sex', 'breed_intake', 'color_intake', 
+                    'animal_type_intake', 'month_year_intake', 'intake_sex', 'age', 'breed_intake', 'color_intake', 
                     'name_outcome', 'date_time_outcome', 'month_year_outcome','outcome_subtype', 'outcome_sex', 
                     'outcome_age', 'gender_outcome', 'fixed_intake', 'fixed_changed', 'date_time_length']
 
@@ -180,14 +180,21 @@ def decision_tree_classifier(table, original_table, attr_indexes, attr_domains, 
     '''
     rand_index = random.randint(0, len(table) - 1)
     instance = table[rand_index]
-    print("Classifying instance: ", instance)
     tree = decision_tree.tdidt(table, attr_indexes, attr_indexes, attr_domains, class_index, header, [])
     utils.pretty_print(tree)
     classification = decision_tree.classify_instance(header, instance, tree)
+
+    print("\n\nDECISION TREE ")
+    print("-" * 50)
+    print("Classifying instance: ", instance)
     print(original_table[rand_index])
     print("Classification: ", classification)
 
 # k-Means Clustering: Kristen
+def clustering(table, attr, attr_indexex, class_index):
+    '''
+    '''
+    
 # Ensemble Learning: kNN or Decision Trees Alana ??? 
 
 def main(): 
@@ -199,11 +206,6 @@ def main():
     original_attr, original_table = utils.parse_csv('dogs_data.csv')
     #attr, table = discretize_age(table, attr)
     utils.convert_data_to_numeric(table)
-
-    age_index = attr.index('age')
-    attr.pop(age_index)
-    for row in table: 
-        row.pop(age_index)
     
     # Gather attribute indexes, attribute domains, and classifying attribute index 
     attr_indexes = list(range(len(attr)))
@@ -213,7 +215,7 @@ def main():
     naive_bayes(table, attr, attr_indexes, class_index)
     
     instance_to_classify = table[0]
-    decision_tree_classifier(table, original_table, attr_indexes, attr_domains, class_index, attr, instance_to_classify)
+    #decision_tree_classifier(table, original_table, attr_indexes, attr_domains, class_index, attr, instance_to_classify)
 
 if __name__ == "__main__":
     main()
