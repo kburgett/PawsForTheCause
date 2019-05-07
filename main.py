@@ -74,7 +74,7 @@ def preprocess():
     utils.write_csv('dogs_data.csv', attr, dogs_data)
 
     # Remove attributes not to be trained on from instances in the dataset 
-    remove_attr = ['animal_id', 'name_intake', 'date_time_intake', 'found_location', 'intake_condition', 
+    remove_attr = ['animal_id', 'name_intake', 'date_time_intake', 'found_location', 
                     'animal_type_intake', 'month_year_intake', 'intake_sex', 'age', 'breed_intake', 'color_intake', 
                     'name_outcome', 'date_time_outcome', 'month_year_outcome','outcome_subtype', 'outcome_sex', 
                     'outcome_age', 'gender_outcome', 'fixed_intake', 'fixed_changed', 'date_time_length']
@@ -201,7 +201,7 @@ def main():
     '''
     '''
     # Preprocess and prep data to be manipulated 
-    #preprocess()
+    preprocess()
     attr, table = utils.parse_csv("clean_data.csv")
     original_attr, original_table = utils.parse_csv('dogs_data.csv')
     #attr, table = discretize_age(table, attr)
@@ -214,7 +214,7 @@ def main():
     
     naive_bayes(table, attr, attr_indexes, class_index)
     
-    instance_to_classify = table[0]
+    #instance_to_classify = table[0]
     #decision_tree_classifier(table, original_table, attr_indexes, attr_domains, class_index, attr, instance_to_classify)
 
 if __name__ == "__main__":
