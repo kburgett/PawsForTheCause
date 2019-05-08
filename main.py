@@ -64,6 +64,7 @@ def preprocess():
     # Remove all duplicate entries 
     animal_ids = set()
     animal_id_index = attr.index('animal_id')
+    gender_index = attr.index('gender_intake')
     for row in table:
         # Check for duplicates
         if row[animal_id_index] in animal_ids:
@@ -71,6 +72,9 @@ def preprocess():
         else: 
             print(row[animal_id_index])
             animal_ids.add(row[animal_id_index]) 
+        # Check that entry has gender
+        if row[gender_index] == '':
+            table.remove(row)
     dogs_data = copy.deepcopy(table)
     utils.write_csv('dogs_data.csv', attr, dogs_data)
 
@@ -140,6 +144,7 @@ def naive_bayes(table, attr, attr_indexes, class_index):
     headers.append("Recognition (%)")
     
     # OUTPUT
+    print(class_domains)
     print("\n\nNAIVE BAYES")
     print("-" * 50)
     print("Accuracy = %f" % acc)
@@ -174,12 +179,11 @@ def clustering(table, attr, attr_indexex, class_index):
 
 def main(): 
     '''
+    Driver program 
     '''
     # Preprocess and prep data to be manipulated 
-    #preprocess()
+    preprocess()
     attr, table = utils.parse_csv("clean_data.csv")
-    #original_attr, original_table = utils.parse_csv('dogs_data.csv')
-    #attr, table = discretize_age(table, attr)
     utils.convert_data_to_numeric(table)
     
     # Gather attribute indexes, attribute domains, and classifying attribute index 
@@ -187,10 +191,8 @@ def main():
     class_index = attr_indexes.pop(len(attr) - 1)
     attr_domains = utils.get_attr_domains(table, attr, attr_indexes)
 
-    naive_bayes(table, attr, attr_indexes, class_index)
+    # Naive Bayes
+    #naive_bayes(table, attr, attr_indexes, class_index)
     
-    #instance_to_classify = table[0]
-    #decision_tree_classifier(table, original_table, attr_indexes, attr_domains, class_index, attr, instance_to_classify)
-
 if __name__ == "__main__":
     main()
