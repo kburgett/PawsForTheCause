@@ -1,5 +1,6 @@
 from tabulate import tabulate 
 import numpy as np
+import itertools
 import operator
 import random
 import math
@@ -790,7 +791,7 @@ def tdidt_stratify_and_confusion_matrix(data, attributes, attr_indexes, attr_dom
     RETURNS: accuracy and printed confusion matrix of classifying results 
     '''
     if discretization is None:
-        class_labels = list(get_attr_domains(data, [class_index]).values())
+        class_labels = list(get_attr_domains(data, [class_index]).values()) 
         class_labels = class_labels[0]
     else: 
         class_labels = list(range(1, 10))
@@ -873,8 +874,9 @@ def tdidt_rules(decision_tree, attributes, class_index, path=[]):
             sub_tree = decision_tree[v][2]
             tdidt_rules(sub_tree, attributes, class_index, rule)
 
-def pretty_print(decision_tree):
+def pretty_print_tree(decision_tree):
     '''
+    Nice print of tree 
     '''
     tab_count = -1
     tree_str = str(decision_tree)
@@ -964,3 +966,215 @@ def random_forest(table, attr_indexes, attr_domains, class_index, col_names, N, 
     
     return top_m_classifiers
     
+#######################################
+# APRIORI ALGORITHM  
+#######################################
+def prepend_attribute_labels(table, col_names):
+    '''
+    Preappend attribute labels before each attribute value in each row of the table
+    PARAMETERS: table = 2D list of instances with attribute values
+                col_names = list of attribute labels 
+    RETURNS: altered table state with attribute labels added before each values
+    '''
+    for row in table: 
+        for i in range(len(col_names)):
+            row[i] = str(col_names[i]) + "=" + str(row[i])
+
+def convert_nominal_attr(table, attr_keys):
+    '''
+    Convert table dataset from keys to nominal attribute values 
+    PARAMETERS: table = 2D list of table instances 
+                attr_keys = 2D list of key value pairs for each attribute instance
+    RETURNS: table with update attribute values (nominal)
+    '''
+    # Convert list of nominal attribute domains into dictionary per attribute
+    for attr in attr_keys:
+        nominal_attr = dict()
+        for key in attr:
+            pair = key.split("=")
+            nominal_attr[pair[1]] = pair[0]
+
+        attr_index = attr_keys.index(attr)
+        attr_keys[attr_index] = nominal_attr
+
+    # Convert all table values to their corresponding nominal attribute values: 
+    for row in table:
+        for i in range(len(row)):
+            attr_domain = attr_keys[i]
+            attr_val = attr_domain[row[i]]
+            row[i] = attr_val
+        
+def check_row_match(terms, row):
+    '''
+    Check that rule contains all attribute values of given rule set (LHS or RHS)
+    exists in table instance 
+    PARAMETERS: terms = rule set to be looking for in given attribute values existence
+                row = table instance to be looking through
+    RETURN: True if terms is a subset of row, False otherwise 
+    '''
+    for term in terms:
+        if term not in row:
+            return 0
+    return 1
+
+def compute_unique_values(table):
+    '''
+    Get I representing possible values of itemset 
+    PARAMETERS: table = 2D list of attribute instances
+    RETURNS: unique_values = sorted list of pssible attribute values
+    '''
+    unique_values = set()
+    for row in table: 
+        for value in row: 
+            unique_values.add(value)
+    return sorted(list(unique_values))
+
+def compute_itemset_support(itemset, table, minsup):
+    '''
+    Given a canadite set of itemsets, evaluate the relationship of each
+    itemset to the table to see if it holds as a valid itemset meeting minsup
+    PARAMETERS: itemset = Ck, list of itemsets generated as canidate set  
+                table = 2D list of instances
+                minsup = minimum support value accepted
+    RETURNS: supported_itemsets = Lk, list of supported itemsets
+    '''
+    supported_itemsets = []
+    for item in itemset:
+        count = 0
+        for row in table:
+            row = set(row)
+            if item.issubset(row):
+                count += 1
+        # Check that support of itemset meets minsup
+        if count/len(table) >= minsup:
+            supported_itemsets.append(item)
+
+    return supported_itemsets
+
+def compute_rule_counts(rule, table): 
+    '''
+    Given a rule, count the number of times it appears in a table 
+    PARAMETERS: rule = LHS and RHS itemsets of a rule
+                table = 2D list of instances 
+    RETURNS: rule = LHS and RHS itemsets, as well as table count for 
+                    each side, both, and total 
+    '''
+    N_left = N_right = N_both = 0
+    N_total = len(table)
+
+    for row in table: 
+        N_left += check_row_match(rule["lhs"], row)
+        N_right += check_row_match(rule["rhs"], row)
+        N_both += check_row_match(rule["lhs"] + rule["rhs"], row)
+
+    rule["N_left"] = N_left
+    rule["N_right"] = N_right
+    rule["N_both"] = N_both
+    rule["N_total"] = N_total
+
+def compute_rule_interestingness(rule, table):
+    '''
+    Calculate the confidence, support, completeness, and lift of a rule in a table
+    PARAMETERS: rule = LHS and RHS itemsets of a rule
+                table = 2D list of instances 
+    RETURNS: rule = LHS, RHS, and all interestingness values 
+    '''
+    compute_rule_counts(rule, table)
+    rule["confidence"] = rule["N_both"] / rule["N_left"]
+    rule["support"] = rule["N_both"] / rule["N_total"]
+    rule["completeness"] = rule["N_both"] / rule["N_right"]
+    rule["lift"] = rule["N_both"] / (rule["N_left"] * rule["N_right"])
+
+def generate_canidate_set(Lk, I, k):
+    '''
+    Generate canidate set given a Lk set 
+    PARAMETERS: Lk = Lk itemset
+                I = itemset of possible attribute value pairings 
+                k = k value representing size of set to be generated
+    RETURNS: Ck = valid canidate set with itemsets of size k
+    '''
+    Ck = []
+    for A in Lk: 
+        for B in Lk:
+            list_A = sorted(list(A))
+            list_B = sorted(list(B))
+            if list_A[0:-1] == list_B[0:-1]:
+                subset = A.union(B)
+                if len(subset) == k and subset not in Ck:
+                    Ck.append(set(subset))
+
+    return Ck
+
+def generate_apriori_rules(table, supported_itemsets, minconf):
+    '''
+    Generate rules that hold at least minconf, using Apriori Algorithm
+    PARAMETERS: table = 2D list of instances 
+                supported_itemset = list of supported itemsets 
+                minconf = minimum confidence value accepted 
+    RETURNS: rules = list of rules accepted by algorithm for reaching 
+                     minconf value 
+    '''
+    rules = []
+    for itemset in supported_itemsets:
+        k = len(itemset)
+        # All possible sizes of items in RHS
+        for i in range(1, k):
+            rhs = list(itertools.combinations(itemset, i))      # Generate all possible RHS of a given size 
+            # Test all rule sets for possible RHSs
+            for r in rhs:
+                lhs = [i for i in itemset if i not in r]        # Generate LHS as all items in itemset not in RHS
+                rule = {"lhs": lhs, "rhs": list(r)}
+                compute_rule_interestingness(rule, table)
+                if rule["confidence"] > minconf:
+                    rules.append(rule)
+    return rules
+    
+def apriori(table, minsup, minconf):
+    '''
+    Implement Apriori Algorithm
+    PARAMETERS: table = 2D list of instances
+                minsup = minimum support value 
+                minconf = minimum confidence value 
+    RETURNS: rules = list of rules for dataset generated by algorithm 
+    '''
+    supported_itemsets = []
+    I = compute_unique_values(table)
+    Lk = [set([item]) for item in I]
+    k = 2
+
+    while len(Lk) != 0:
+        sorted(Lk)
+        Ck = generate_canidate_set(Lk, I, k)
+        Lk = compute_itemset_support(Ck, table, minsup)
+        k += 1
+        supported_itemsets.extend(Lk)
+
+    rules = generate_apriori_rules(table, supported_itemsets, minconf)
+    return rules 
+
+def pretty_print_apriori(rules):
+    '''
+    Pretty print Association Rules along with their support, confidence, and lift 
+    PARAMETERS: rules = list of rules 
+    '''
+    header = ["Association Rule", "Support", "Confidence", "Lift"]
+    table = []
+
+    for rule in rules: 
+        row = []
+        # Format rule appearence
+        association_rule = " AND ".join(rule["lhs"])
+        association_rule += " => "
+        association_rule += " AND ".join(rule["rhs"])
+        row.append(association_rule)
+        row.append(rule["support"])
+        row.append(rule["confidence"])
+        row.append(rule["lift"])
+
+        table.append(row)
+    
+    print(tabulate(table, header, tablefmt='rst'))
+
+#######################################
+# CLUSTERING  
+#######################################
