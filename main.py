@@ -1,3 +1,4 @@
+from tabulate import tabulate 
 import utils 
 import decision_tree
 import random
@@ -88,61 +89,24 @@ def preprocess():
 
     utils.write_csv('clean_data.csv', attr, table)
 
-def discretize_age(table, attr):
-    '''
-    '''
-    age_index = attr.index('age')
-    age_bucket_index = attr.index('age_bucket')
-    age_bucket_domain = utils.get_attr_domains(table, attr, [age_bucket_index])
-    age_bucket_domain = age_bucket_domain['age_bucket']
-    
-    # Bucket Keys
-    years = sorted([y for y in age_bucket_domain if 'year' in y], reverse=True)
-    months = sorted([m for m in age_bucket_domain if 'month' in m], reverse=True)
-    weeks = sorted([w for w in age_bucket_domain if 'week' in w], reverse=True)
-    days = weeks.pop(0)
-
-    for row in table: 
-        print(row[age_index], end='\t\t')
-        # Days
-        if 'day' in row[age_index]:
-            row[age_index] = days 
-        # Weeks
-        if 'week' in row[age_index]:
-            row[age_index] = weeks[0]
-        # Months
-        if 'month' in row[age_index]:
-            val = row[age_index].split(' ')[0]
-            for m in months:
-                if val > m[0]:
-                    row[age_index] = m
-                    break
-            row[age_index] = months[len(months) - 1]
-        # Years
-        if 'year' in row[age_index]:
-            val = row[age_index].split(' ')[0]
-            for y in years:
-                if val > y[0]:
-                    row[age_index] = y
-                    break
-            row[age_index] = years[len(years) - 1]  
-         
-        print(row[age_index])
-
-    print("SOS:", age_bucket_domain)
-    
-    return attr, table
-
-
 # Naive Bayes: Kristen
 def naive_bayes(table, attr, attr_indexes, class_index): 
     '''
+    Utilize Naive Bayes Classifier from utils.py file
+    Train on cleaned data, to find accuracy of classifier. 
     '''  
     # Stratify data across 10 folds
     stratified_data = utils.stratify_data(table, class_index, 10)
-
+    
+    # Initialize data set up 
     tp_tn = 0
     total = 0
+    class_domains = utils.get_attr_domains(table, attr, [class_index])
+    class_domains = class_domains[attr[class_index]]
+    class_domains.sort(key = lambda x: x.split()[1])
+    confusion_table= [[0 for _ in class_domains] for _ in class_domains]
+
+    # Stratified folds 
     for i in range(len(stratified_data)):
         train_set = []
         test_set = stratified_data.pop(i)
@@ -158,19 +122,30 @@ def naive_bayes(table, attr, attr_indexes, class_index):
             # Classify predicted and actual classes
             pred_class = utils.naive_bayes(train_set, classes, conditions, attr, priors, posts, inst, class_index)
             actual_class = inst[class_index]
-            print(pred_class, "\t\t", actual_class)
             if pred_class == actual_class:
                 tp_tn += 1
+            
+            pred_label = class_domains.index(pred_class)
+            actual_label = class_domains.index(actual_class)
+            confusion_table[actual_label][pred_label] += 1
         
         # Return test set to stratified folds 
         stratified_data.insert(i, test_set)
     
+    # Calculate accuracy and Confusion Matrix 
     acc = tp_tn / total
+    confusion_matrix = utils.format_confusion_table(confusion_table, len(class_domains), class_domains)
+    headers = class_domains
+    headers.append("Total")
+    headers.append("Recognition (%)")
+    
+    # OUTPUT
     print("\n\nNAIVE BAYES")
     print("-" * 50)
     print("Accuracy = %f" % acc)
-    print("Error Rate = %f" % (1 - acc))
-            
+    print("Error Rate = %f" % (1 - acc))    
+    print()   
+    print(tabulate(confusion_matrix, headers, tablefmt='rst'))
 
 # Decision Trees: Alana
 def decision_tree_classifier(table, original_table, attr_indexes, attr_domains, class_index, header, instance_to_classify):
@@ -201,9 +176,9 @@ def main():
     '''
     '''
     # Preprocess and prep data to be manipulated 
-    preprocess()
+    #preprocess()
     attr, table = utils.parse_csv("clean_data.csv")
-    original_attr, original_table = utils.parse_csv('dogs_data.csv')
+    #original_attr, original_table = utils.parse_csv('dogs_data.csv')
     #attr, table = discretize_age(table, attr)
     utils.convert_data_to_numeric(table)
     
@@ -211,7 +186,7 @@ def main():
     attr_indexes = list(range(len(attr)))
     class_index = attr_indexes.pop(len(attr) - 1)
     attr_domains = utils.get_attr_domains(table, attr, attr_indexes)
-    
+
     naive_bayes(table, attr, attr_indexes, class_index)
     
     #instance_to_classify = table[0]
