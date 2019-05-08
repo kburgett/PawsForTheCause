@@ -623,7 +623,7 @@ def tdidt(instances, attr_indexes, attr_domains, class_index, header=None, chose
         attr_index = attr_indexes.pop(0)
     
     # Parition data by attribute values 
-    partition = partition_instances(instances, attr_index, attr_domains[attr_index])
+    partition = partition_instances(instances, attr_index, attr_domains.get(header[attr_index]))
 
     case3 = False
     sub_tree = ["Attribute", header[attr_index]]

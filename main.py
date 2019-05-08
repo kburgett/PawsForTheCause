@@ -166,7 +166,7 @@ def decision_tree_classifier(table, original_table, attr_indexes, attr_domains, 
     rand_index = random.randint(0, len(table) - 1)
     instance = table[rand_index]
     print("Classifying instance: ", instance)
-    tree = decision_tree.tdidt(table, attr_indexes, attr_indexes, attr_domains, class_index, header, [])
+    tree = utils.tdidt(table, attr_indexes, attr_domains, class_index, header, False)
     utils.pretty_print(tree)
     classification = decision_tree.classify_instance(header, instance, tree)
     print(original_table[rand_index])
@@ -193,7 +193,7 @@ def main():
     for key in attr_domains:
         print(key, attr_domains[key])
     
-    naive_bayes(table, attr, attr_indexes, class_index)
+    #naive_bayes(table, attr, attr_indexes, class_index)
 
     instance_to_classify = table[0]
     decision_tree_classifier(table, original_table, attr_indexes, attr_domains, class_index, attr, instance_to_classify)
