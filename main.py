@@ -184,7 +184,7 @@ def clustering(table, attr, attr_indexes, attr_domains):
     best_centroids = []
     k_clusters = []
     cluster_scores = []
-    for i in range(2, 10):
+    for i in range(2, len(attr)):
         k_clusters.append(i)
         cluster_quality, clusters, centroids = utils.k_means_clustering(table, attr_indexes, i)
         cluster_scores.append(cluster_quality)
@@ -252,7 +252,7 @@ def main():
     attr_indexes = list(range(len(attr)))
     attr_domains = utils.get_attr_domains(table, attr, attr_indexes)
     utils.randomize_data(table)
-    clustering(table, attr, attr_indexes, attr_domains)
+    clustering(table[:1000], attr, attr_indexes, attr_domains)
 
 if __name__ == "__main__":
     main()
