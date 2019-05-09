@@ -1292,5 +1292,5 @@ def k_means_clustering(data, attr_indexes, k):
             if i >= len(data):
                 moved = False
 
-    # Output Cluster Quality of Classifier
-    return cluster_quality(centroids, clusters) 
+    # Output Cluster Quality of Classifier, Clusters and Centroids
+    return cluster_quality(centroids, clusters), clusters, centroids

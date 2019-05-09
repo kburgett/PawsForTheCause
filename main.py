@@ -1,5 +1,6 @@
 from tabulate import tabulate
 import matplotlib.pyplot as plt
+import statistics
 import utils
 import decision_tree
 import random
@@ -145,7 +146,6 @@ def naive_bayes(table, attr, attr_indexes, class_index):
     headers.append("Recognition (%)")
 
     # OUTPUT
-    print(class_domains)
     print("\n\nNAIVE BAYES")
     print("-" * 50)
     print("Accuracy = %f" % acc)
@@ -180,12 +180,19 @@ def clustering(table, attr, attr_indexes, attr_domains):
 
     # Find best k-value
     best_k = 0
+    best_clusters = []
+    best_centroids = []
     k_clusters = []
     cluster_scores = []
     for i in range(2, 10):
         k_clusters.append(i)
-        cluster_quality = utils.k_means_clustering(table, attr_indexes, i)
+        cluster_quality, clusters, centroids = utils.k_means_clustering(table, attr_indexes, i)
         cluster_scores.append(cluster_quality)
+        
+        if cluster_quality <= min(cluster_scores):
+            best_k = i
+            best_clusters = clusters
+            best_centroids = centroids
     
     best_k = k_clusters[cluster_scores.index(min(cluster_scores))]
     print("The best k-value is: ", best_k)
@@ -193,10 +200,35 @@ def clustering(table, attr, attr_indexes, attr_domains):
     # Show k-value Cluster Qualities to determine best k
     plt.figure()
     plt.title("Best k-value")
+    plt.xlabel("Number of clusters k")
+    plt.ylabel("TSS Value")
     plt.plot(k_clusters, cluster_scores)
     plt.show()
 
-# Ensemble Learning (kNN or Decision Trees): Alana
+    # Plot Cluster Data for best-k value
+    # Src: https://stackoverflow.com/questions/28999287/generate-random-colors-rgb/28999469
+    # https://towardsdatascience.com/k-means-clustering-algorithm-applications-evaluation-methods-and-drawbacks-aa03e644b48a
+    '''plt.figure()
+    for i in range(len(best_clusters)):
+        plt.scatter(best_clusters[i], i, c='blue')
+    plt.show()'''
+
+    # Show most common values for each attribute in a cluster
+    print("=" * 50)
+    print("MOST COMMON ATTRIBUTE VALUES BASED ON CLUSTER")
+    print("=" * 50)
+    for cluster in best_clusters:
+        print("-" * 50)
+        print("Cluster ", best_clusters.index(cluster))
+        print("-" * 50)
+        for i in range(len(attr)): 
+            attr_col = utils.get_frequencies(cluster, i)
+            k = list(attr_col.keys())
+            v = list(attr_col.values())
+            val = k[v.index(max(v))]
+            attr_domain = attr_domains[attr[i]]
+            print("%s : %s" % (attr[i], attr_domain[val]))
+
 
 def main():
     '''
@@ -204,6 +236,7 @@ def main():
     '''
     # Preprocess and prep data to be manipulated
     #preprocess()
+
     attr, table = utils.parse_csv("clean_data.csv")
     utils.convert_data_to_numeric(table)
 
@@ -215,15 +248,11 @@ def main():
     # Naive Bayes
     #naive_bayes(table, attr, attr_indexes, class_index)
 
-    # Decision Trees
-
     # k-Means Clustering
     attr_indexes = list(range(len(attr)))
     attr_domains = utils.get_attr_domains(table, attr, attr_indexes)
     utils.randomize_data(table)
     clustering(table, attr, attr_indexes, attr_domains)
-
-    # Ensemble Learning (Random Forest)
 
 if __name__ == "__main__":
     main()
