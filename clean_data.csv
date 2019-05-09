@@ -6483,7 +6483,6 @@ Owner Surrender,Normal,Return to Owner,Female,Spayed,4-6 years,0,0,0,0,0,0,0,0,1
 Stray,Normal,Return to Owner,Female,Spayed,1-3 years,0,0,0,0,0,0,0,0,0,1,0-7 days
 Stray,Normal,Return to Owner,Female,Spayed,1-3 years,0,0,0,0,0,0,0,0,0,1,1-2 years
 Stray,Injured,Return to Owner,Female,Spayed,4-6 years,0,0,0,0,0,0,0,0,0,1,1-2 years
-Stray,Sick,Transfer,,Unknown,1-3 years,0,0,0,1,0,0,0,0,0,0,0-7 days
 Stray,Normal,Transfer,Male,Intact,1-6 weeks,0,0,0,0,0,0,0,0,0,1,0-7 days
 Stray,Normal,Adoption,Female,Spayed,1-6 months,0,1,0,0,0,0,0,0,0,0,0-7 days
 Stray,Normal,Adoption,Female,Spayed,1-3 years,0,1,0,0,0,0,0,0,0,0,1-3 weeks
@@ -17946,7 +17945,6 @@ Public Assist,Normal,Return to Owner,Female,Intact,7-12 months,0,0,0,0,0,0,0,0,0
 Public Assist,Normal,Euthanasia,Female,Intact,1-6 months,0,0,0,0,0,0,0,0,0,1,1-3 weeks
 Public Assist,Normal,Return to Owner,Male,Neutered,1-3 years,0,0,0,0,0,0,0,0,0,0,0-7 days
 Stray,Normal,Return to Owner,Male,Neutered,7+ years,0,0,0,1,0,0,0,0,0,0,0-7 days
-Stray,Normal,,Female,,1-3 years,1,0,0,0,0,0,0,0,0,0,1-3 weeks
 Stray,Normal,Transfer,Female,Spayed,1-3 years,0,0,0,0,0,1,0,0,0,0,0-7 days
 Stray,Normal,Transfer,Female,Spayed,1-6 months,0,0,0,0,0,1,0,0,0,0,6-12 months
 Owner Surrender,Normal,Transfer,Male,Neutered,7-12 months,1,0,0,0,0,0,0,0,0,0,0-7 days
@@ -23958,7 +23956,6 @@ Stray,Normal,Return to Owner,Female,Spayed,1-3 years,0,0,0,0,0,0,0,0,0,1,3-6 wee
 Public Assist,Normal,Adoption,Male,Neutered,1-3 years,1,0,1,0,0,0,0,0,0,0,1-2 years
 Public Assist,Normal,Adoption,Male,Neutered,1-3 years,1,0,1,0,0,0,0,0,0,0,1-2 years
 Owner Surrender,Normal,Adoption,Male,Neutered,1-3 years,1,0,1,0,0,0,0,0,0,0,0-7 days
-Stray,Nursing,Transfer,,Unknown,7+ years,1,0,0,0,0,0,0,0,0,0,0-7 days
 Euthanasia Request,Sick,Euthanasia,Female,Intact,7-12 months,1,0,0,0,0,0,0,0,0,0,3-6 weeks
 Stray,Normal,Transfer,Female,Spayed,1-3 years,0,0,0,1,0,0,0,0,0,1,7-12 weeks
 Owner Surrender,Normal,Transfer,Male,Intact,1-3 years,0,0,0,0,0,0,0,1,0,0,0-7 days
@@ -32872,7 +32869,6 @@ Owner Surrender,Normal,Adoption,Female,Spayed,7+ years,0,0,0,0,0,0,0,0,1,0,0-7 d
 Stray,Normal,Return to Owner,Male,Neutered,4-6 years,1,0,0,0,0,0,0,0,0,0,0-7 days
 Owner Surrender,Normal,Transfer,Male,Neutered,1-3 years,0,0,0,1,0,0,0,0,0,1,0-7 days
 Owner Surrender,Normal,Adoption,Male,Intact,1-3 years,0,0,0,0,0,0,0,0,1,0,0-7 days
-Stray,Sick,Transfer,,Unknown,1-6 months,0,0,0,0,0,0,0,0,0,1,0-7 days
 Stray,Normal,Adoption,Male,Neutered,1-6 months,0,0,0,0,0,0,0,0,0,0,0-7 days
 Stray,Normal,Adoption,Male,Intact,1-6 months,0,0,0,0,0,0,0,0,0,0,0-7 days
 Stray,Normal,Return to Owner,Female,Spayed,4-6 years,0,0,0,1,0,0,0,0,0,0,0-7 days
