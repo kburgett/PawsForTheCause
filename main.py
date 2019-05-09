@@ -161,7 +161,8 @@ def decision_tree_classifier(table, original_table, attr_indexes, attr_domains, 
     '''
     rand_index = random.randint(0, len(table) - 1)
     instance = table[rand_index]
-    tree = decision_tree.tdidt(table, attr_indexes, attr_indexes, attr_domains, class_index, header, [])
+    print("Classifying instance: ", instance)
+    tree = utils.tdidt(table, attr_indexes, attr_domains, class_index, header, False)
     utils.pretty_print(tree)
     classification = decision_tree.classify_instance(header, instance, tree)
 
@@ -172,6 +173,104 @@ def decision_tree_classifier(table, original_table, attr_indexes, attr_domains, 
     print("Classification: ", classification)
 
 # k-Means Clustering: Kristen
+# Ensemble Learning: kNN or Decision Trees Alana ???
+
+def bootstrap(remainder_set):
+    training_set = []
+    validation_set = []
+    for i in range(2 * len(remainder_set) // 3):
+        random_index = random.randint(0, len(remainder_set)-1)
+        training_set.append(remainder_set[random_index])
+    for i in range(len(remainder_set) // 3):
+        random_index = random.randint(0, len(remainder_set)-1)
+        validation_set.append(remainder_set[random_index])
+    return training_set, validation_set
+
+def forest_classifier(table, att_indexes, att_domains, class_index, header, class_values, n, m):
+    '''
+    Calls the functions to get a decision tree for the data and uses that decision
+    tree and classifies a given instance. Returns the classification to main()
+    '''
+    test_set, remainder_set = utils.random_test_set(table, header, 3, att_domains, class_values)
+    forest = generate_forest(remainder_set, att_indexes, att_domains, class_index, header, [], n, m)
+    #print(forest)
+    correct_classifications = 0
+    for instance in test_set:
+        classifications = []
+        for tree in forest:
+            classifications.append(utils.classify_tdidt(tree, instance, header))
+        classification = get_majority_vote(classifications)
+        print(instance," classified as ", classification)
+        if instance[len(instance) - 1] == classification:
+            correct_classifications += 1
+        
+    print("Forest Accuracy: ", correct_classifications / len(test_set))
+
+    #classification = classify_instance(header, instance_to_classify, tree)
+    #return classification
+def get_majority_vote(classifications):
+    max_count = 0
+    majority_classification = None
+    classifications_set = set(classifications)
+    for item in classifications_set:
+        count = 0
+        for classification in classifications:
+            if classification == item:
+                count += 1
+        if count > max_count:
+            majority_classification = item
+    return majority_classification
+
+def random_test_set(table, header, k, att_domains, class_values):
+    '''
+    Build random test and training sets. 
+    The training set is 2/3 of the data
+    and the test set is 1/3 of the data
+    '''
+    random_table = table
+    random.shuffle(random_table)
+    training_set = []
+    test_set = []
+    for i in range(2 * len(table) // 3):
+        training_set.append(table[i])
+    for i in range(2 * len(table) // 3, len(table)- 1):
+        test_set.append(table[i])
+
+    return test_set, training_set
+
+def generate_forest(remainder_set, attr_indexes, attr_domains, class_index, header, tree, n, m):
+    # get training and validation set
+    # bootstrap method
+    forest = []
+    best_trees = []
+    for index in range(n):
+        training_set, validation_set = bootstrap(remainder_set)
+        #print("TRAIN ON : ", training_set)
+        #print("VALIDATE ON : ", validation_set)
+        tree = utils.tdidt(training_set, attr_indexes, attr_domains, class_index, header, False)
+        print(type(tree[0]))
+        forest.append(tree)
+    #print("FOREST: ", forest)
+
+    for i in range(m):
+        best_trees.append(forest)
+
+    for i in range(m, len(forest)):
+        for j in range(len(best_trees)):
+            if find_accuracy(best_trees[j], validation_set, header) < find_accuracy(forest[i], validation_set, header):
+                best_trees[j] = forest[i]
+                break
+    print(forest)
+    #print("len(forest: ", len(forest))
+    return forest
+
+def find_accuracy(tree, validation_set, header):
+    correct_classifications = 0
+    for instance in validation_set:
+        classification = utils.classify_tdidt(tree, instance, header)
+        if classification == instance[len(instance)-1]:
+            correct_classifications += 1
+    return correct_classifications / len(validation_set)
 def clustering(table, attr, attr_indexes, attr_domains):
     '''
     '''
