@@ -93,7 +93,7 @@ def find_entropy_value(table, header, attribute_index, att_domains):
             total += 1
         e_yes_values.append(num_yes / total)
         e_no_values.append((total - num_yes)/ total)
-        e_new = 0
+        e_new = 0  
         for i in range(len(e_yes_values)):
             print("yes_value: ", i)
             if e_yes_values[i] == 0:
