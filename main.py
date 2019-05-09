@@ -179,22 +179,22 @@ def clustering(table, attr, attr_indexes, attr_domains):
     utils.discretize_data(table, attr, attr_indexes, attr_domains)
 
     # Find best k-value
+    best_k = 0
     k_clusters = []
     cluster_scores = []
-    for i in range(2, 10, 2):
-        print("Cluster ", i, ":", end="")
-        cluster_quality = utils.k_means_clustering(table, attr_indexes, i)
+    for i in range(2, 10):
         k_clusters.append(i)
+        cluster_quality = utils.k_means_clustering(table, attr_indexes, i)
         cluster_scores.append(cluster_quality)
-        print(cluster_quality)
+    
+    best_k = k_clusters[cluster_scores.index(min(cluster_scores))]
+    print("The best k-value is: ", best_k)
 
     # Show k-value Cluster Qualities to determine best k
     plt.figure()
     plt.title("Best k-value")
     plt.plot(k_clusters, cluster_scores)
     plt.show()
-
-
 
 # Ensemble Learning (kNN or Decision Trees): Alana
 
@@ -218,21 +218,9 @@ def main():
     # Decision Trees
 
     # k-Means Clustering
-    # Attribute Selection
-    remove_attr = ['retriever', 'shepherd', 'beagle', 'terrier', 'boxer',
-                    'poodle', 'rottweiler', 'dachshund', 'chihuahua', 'pitbull']
-    # Remove each attribute from all rows
-    for col in remove_attr:
-        index = attr.index(col)
-        attr.pop(index)
-        for row in table:
-            row.pop(index)
-
     attr_indexes = list(range(len(attr)))
     attr_domains = utils.get_attr_domains(table, attr, attr_indexes)
     utils.randomize_data(table)
-    table = table[:10]
-    print(table)
     clustering(table, attr, attr_indexes, attr_domains)
 
     # Ensemble Learning (Random Forest)
