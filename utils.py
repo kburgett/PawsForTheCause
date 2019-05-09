@@ -1268,25 +1268,29 @@ def k_means_clustering(data, attr_indexes, k):
     clusters = [[c] for c in centroids]
 
     moved = True
+    i = 0
     while moved:
         # Assign each instance to it's nearest cluster
-        for inst in data:
-            print(inst)
-            distances = []
-            for c in centroids:
-                dist = compute_distance(inst, c, attr_indexes)
-                distances.append(dist)
+        inst = data[i]
+        print(inst)
+        distances = []
+        for c in centroids:
+            dist = compute_distance(inst, c, attr_indexes)
+            distances.append(dist)
 
-            cluster_index = distances.index(min(distances))
-            clusters[cluster_index].append(inst)
+        cluster_index = distances.index(min(distances))
+        clusters[cluster_index].append(inst)
 
-            print("CLUSTERS", clusters)
-            # Recalculate centroid
-            old_centroids = centroids
-            centroids = compute_centroids(clusters)
+        # Recalculate centroid
+        old_centroids = centroids
+        centroids = compute_centroids(clusters)
 
-            # Check if centroids moved to continue
-            moved = check_clusters_moved(old_centroids, centroids)
+        # Check if centroids moved to continue
+        moved = check_clusters_moved(old_centroids, centroids)
+        if moved:
+            i += 1
+            if i >= len(data):
+                moved = False
 
     # Output Cluster Quality of Classifier
-    return cluster_quality(centroids, clusters)
+    return cluster_quality(centroids, clusters) 
