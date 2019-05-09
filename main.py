@@ -174,6 +174,7 @@ def decision_tree_classifier(table, original_table, attr_indexes, attr_domains, 
 # k-Means Clustering: Kristen
 def clustering(table, attr, attr_indexes, attr_domains):
     '''
+    Implement unsupervised classifier: k-Means Clustering 
     '''
     # Change categorical data into continuous data
     utils.discretize_data(table, attr, attr_indexes, attr_domains)

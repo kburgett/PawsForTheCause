@@ -1205,6 +1205,9 @@ def pretty_print_apriori(rules):
 def get_inital_centroids(data, k):
     '''
     Return initial k inital centroids
+    PARAMETERS: data = 2D list of instances 
+                k = k-value
+    RETURNS: centroids = list of centorid instances 
     '''
     centroids = []
     for _ in range(k):
@@ -1262,6 +1265,12 @@ def cluster_quality(centroids, clusters):
 def k_means_clustering(data, attr_indexes, k):
     '''
     Perrform k-Means Clustering Classifier
+    PARAMETERS: data = 2D list of instances
+                attr_indexs = list of indexes to create clusters 
+                k = k-value 
+    RETURNS: cluster_quality = TSS value of cluster quality
+             clusters = list of clustered instances
+             centroids = list of centroid values for each cluster
     '''
     # Select k instances for initial centroids
     centroids = get_inital_centroids(data, k)
