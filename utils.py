@@ -616,7 +616,7 @@ def tdidt(instances, attr_indexes, attr_domains, class_index, header=None, chose
     RETURN: sub_tree = tdidt 
     '''
     # Pick attribute ("attribute selection")
-    if not chosen_attr: 
+    if not chosen_attr:
         attr_index = select_attribute(instances, attr_indexes, class_index)
         attr_indexes.remove(attr_index)
     else:
@@ -766,6 +766,7 @@ def classify_tdidt(decision_tree, instance, header):
                 header = list of attribute labels
     RETURNS: classification label 
     '''
+    #print(decision_tree)
     if 'Leaves' in decision_tree[0]:
         return decision_tree[1][0]   # label of leaf instance 
     else:
@@ -894,6 +895,37 @@ def pretty_print(decision_tree):
 #######################################
 # ENSEMBLE LEARNING  
 #######################################
+
+def get_majority_vote(classifications):
+    max_count = 0
+    majority_classification = None
+    classifications_set = set(classifications)
+    for item in classifications_set:
+        count = 0
+        for classification in classifications:
+            if classification == item:
+                count += 1
+        if count > max_count:
+            majority_classification = item
+    return majority_classification
+
+def random_test_set(table, header, k, att_domains, class_values):
+    '''
+    Build random test and training sets. 
+    The training set is 2/3 of the data
+    and the test set is 1/3 of the data
+    '''
+    random_table = table
+    random.shuffle(random_table)
+    training_set = []
+    test_set = []
+    for i in range(2 * len(table) // k):
+        training_set.append(table[i])
+    for i in range(2 * len(table) // k, len(table)- 1):
+        test_set.append(table[i])
+
+    return test_set, training_set
+
 def get_random_attr_subset(attributes, F):
     '''
     Randomly select F attributes to train on given list of available attributes
